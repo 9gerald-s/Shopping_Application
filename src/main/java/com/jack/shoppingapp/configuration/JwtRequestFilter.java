@@ -16,8 +16,13 @@ public class JwtRequestFilter extends OncePerRequestFilter{
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		
+
+		final String header = request.getHeader("Auth");
+		String jwtToken = null;
+		String userName = null;
+		if(header != null && header.startsWith("Bearer ")) {
+			jwtToken = header.substring(7);
+		}
 	}
 
 }
