@@ -4,11 +4,13 @@ import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.PostPersist;
 import javax.persistence.PrePersist;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
@@ -17,8 +19,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 @Entity
+@Table(name = "users")
 public class User {
 
+	@Id
 	private String userName;
 	private String firstName;
 	private String lastName;
@@ -26,11 +30,11 @@ public class User {
 	private String password;
 	private Boolean isActive;
 	private Integer loginCount=0;
-	@Type(type = "ogr.jadira.usertype.dateandtime.joda.PersistantDateTime")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime createdAt;
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistantDateTime")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime updatedAt;
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistantDateTime")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime loginAt;
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "USER_ROLE", joinColumns = @JoinColumn(name = "USER_ID"), inverseJoinColumns = @JoinColumn(name = "ROLE_ID"))

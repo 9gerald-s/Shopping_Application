@@ -31,9 +31,11 @@ public class JwtUtil {
 		final Date expirationDate = claims.getExpiration();
 		boolean isNotExpired = expirationDate.after(new Date());
 		return (userName.equals(userDetails.getUsername()) && isNotExpired);
-		
 	}
 
+	public String getUserNameFromToken(String token) {
+		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+	}
 	private Claims getAllClaimsFromToken(String token) {
 
 		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();

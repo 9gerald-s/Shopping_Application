@@ -1,21 +1,24 @@
 package com.jack.shoppingapp.service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.jack.shoppingapp.dto.UserDTO;
-import com.jack.shoppingapp.entity.ERole;
 import com.jack.shoppingapp.entity.Role;
 import com.jack.shoppingapp.entity.User;
 import com.jack.shoppingapp.exceptions.ErrorResponse;
+import com.jack.shoppingapp.models.ERole;
 import com.jack.shoppingapp.repository.RoleRepository;
 import com.jack.shoppingapp.repository.UserRepository;
+import com.jack.shoppingapp.utils.JwtUtil;
 
 @Service
 public class UserService {
@@ -29,6 +32,9 @@ public class UserService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	@Autowired
+	private JwtUtil jwtUtil;
+
 	public ResponseEntity<?> registerUser(UserDTO userDTO) {
 		if (userRepository.existsById(userDTO.getUserName())) {
 			return ResponseEntity.badRequest()
@@ -40,6 +46,10 @@ public class UserService {
 		user.setLastName(userDTO.getLastName());
 		user.setPassword(getEncodedPassword(userDTO.getPassword()));
 		user.setIsActive(true);
+		Set<Role> userRoles = new HashSet<>();
+		Role role = roleRepository.findById(ERole.ROLE_USER).get();
+		userRoles.add(role);
+		user.setRoles(userRoles);
 		user = userRepository.save(user);
 
 		return ResponseEntity.status(200).body(user);
@@ -65,11 +75,31 @@ public class UserService {
 		adminUser.setPassword(getEncodedPassword("admin@pass"));
 		adminUser.setFirstName("admin");
 		adminUser.setLastName("admin");
+		adminUser.setIsActive(true);
 		Set<Role> adminRoles = new HashSet<>();
 		adminRoles.add(adminRole);
 		adminUser.setRoles(adminRoles);
 		userRepository.save(adminUser);
 
+	}
+
+	public ResponseEntity<?> getAllUsers() {
+		List<User> user = userRepository.findAll();
+		return ResponseEntity.status(200).body(user);
+	}
+
+	public ResponseEntity<?> deleteUser(String userName, String jwtToken) {
+		
+		jwtToken = jwtToken.substring(7);
+
+		String currentUserName = jwtUtil.getUserNameFromToken(jwtToken);
+		if (!currentUserName.equals(userName)) {
+			userRepository.deleteById(userName);
+		} else {
+			throw new AccessDeniedException(
+					"Current User cannot current user record. please login in with different account to delete this record");
+		}
+		return ResponseEntity.status(200).body(userName + " deleted from db");
 	}
 
 }

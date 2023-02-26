@@ -1,4 +1,4 @@
-package com.jack.shoppingapp.entity;
+package com.jack.shoppingapp.models;
 
 import org.springframework.security.core.GrantedAuthority;
 
