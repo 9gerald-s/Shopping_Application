@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jack.shoppingapp.dto.UserDTO;
+import com.jack.shoppingapp.models.ChangePswdRequest;
 import com.jack.shoppingapp.service.UserService;
 
 @RestController
@@ -43,7 +43,12 @@ public class UserController {
 	
 	@DeleteMapping("/deleteUser/{userName}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<?> deleteUser(@PathVariable("userName") String userName,@RequestHeader(value = "Auth") String auth){
-		return userService.deleteUser(userName,auth);
+	public ResponseEntity<?> deleteUser(@PathVariable("userName") String userName){
+		return userService.deleteUser(userName);
+	}
+	
+	@PostMapping("/changePswd")
+	public ResponseEntity<?> changeUserPassword(@RequestBody ChangePswdRequest request){
+		return userService.changeUserPassword(request);
 	}
 }
